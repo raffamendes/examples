@@ -13,8 +13,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class EventReader {
 
 	@Incoming("account-events")
-	public void proccess(String record) throws JsonMappingException, JsonProcessingException {
-		Struct struct = new ObjectMapper().readValue(record, Struct.class);
-		System.out.println(struct.getString("op"));
+	public void proccess(String record) {
+		try {
+			Struct struct = new ObjectMapper().readValue(record, Struct.class);
+			System.out.println(record);
+			System.out.println(struct);
+			System.out.println(struct.getString("op"));
+		} catch (JsonMappingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 }
