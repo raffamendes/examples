@@ -8,7 +8,6 @@ public class StructDeserializer extends JsonbDeserializer<Struct>{
 
 	public StructDeserializer() {
 		super(Struct.class);
-		// TODO Auto-generated constructor stub
 	}
 
 }
