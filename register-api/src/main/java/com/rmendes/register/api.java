@@ -1,5 +1,6 @@
 package com.rmendes.register;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -11,7 +12,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +36,7 @@ public class api {
 			throw e;
 		}
 	}
-	
+
 	@GET
 	@Path("/blocked")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -56,8 +59,8 @@ public class api {
 			throw e;
 		}
 	}
-	
-	
+
+
 
 
 	@POST
@@ -86,16 +89,18 @@ public class api {
 		}
 	}
 
+
 	@PUT
+	@Path("/updateBalance/{id}/{balance}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Account update(@Valid Account account) {
+	public Account update(@PathParam("id") Long id, @PathParam("balance") BigDecimal balance) {
 		try {
-			account.isPersistent();
+			Account account = Account.findById(id);
+			account.balance = balance;
 			return account;
 		}catch (Exception e) {
-			LOGGER.error("Error on create: "+e.getCause());
-			throw e;
+			throw new WebApplicationException("Error on update balance: "+e.getMessage(), Status.INTERNAL_SERVER_ERROR);
 		}
 	}
 
