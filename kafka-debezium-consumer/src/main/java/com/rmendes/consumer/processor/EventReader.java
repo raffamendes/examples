@@ -16,7 +16,7 @@ public class EventReader {
 	public void proccess(String record) {
 		try {
 			JsonNode jsonNode = new ObjectMapper().readTree(record);
-			System.out.println("Type of Record: " + jsonNode.get("op").asText());
+			System.out.println("Type of Record: " + jsonNode.path("payload").path("op").asText());
 		} catch (JsonMappingException e) {
 			e.printStackTrace();
 		} catch (JsonProcessingException e) {
