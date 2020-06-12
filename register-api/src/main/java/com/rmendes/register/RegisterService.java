@@ -18,12 +18,14 @@ import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.LoggerFactory;
 
+import com.rmendes.register.exceptions.NegativeBalanceOnCreationException;
 import com.rmendes.register.model.Account;
+import com.rmendes.register.model.Result;
 
 @Path("/register")
-public class api {
+public class RegisterService {
 
-	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(api.class);
+	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(RegisterService.class);
 
 	@GET
 	@Path("/{id}")
@@ -66,10 +68,14 @@ public class api {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Account create(@Valid Account account) {
+	public Result create(@Valid Account account) {
 		try {
-			account.persist();
-			return account;
+			if(account.balance.compareTo(BigDecimal.ZERO) > 0) {
+				account.persist();
+				return new Result("Account registered!"); 
+			}else {
+				throw new NegativeBalanceOnCreationException();
+			}
 		}catch (Exception e) {
 			LOGGER.error("Error on create: "+e.getCause());
 			throw e;
