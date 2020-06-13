@@ -3,8 +3,10 @@ package com.rmendes.register;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.Validator;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -26,6 +28,9 @@ import com.rmendes.register.model.Result;
 public class RegisterService {
 
 	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(RegisterService.class);
+	
+	@Inject
+	Validator validator;
 
 	@GET
 	@Path("/{id}")
