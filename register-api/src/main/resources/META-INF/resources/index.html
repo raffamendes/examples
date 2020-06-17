@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Book Validator</title>
+    <title>Account Creator</title>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/patternfly/3.24.0/css/patternfly-additions.min.css">
 </head>
@@ -81,7 +81,7 @@
                 $.ajax({
                     url: "/register/",
                     type: "POST",
-                    data: JSON.stringify(book),
+                    data: JSON.stringify(account),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                 }).done(function (d) {
