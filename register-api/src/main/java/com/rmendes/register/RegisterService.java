@@ -16,6 +16,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.LoggerFactory;
@@ -35,35 +36,35 @@ public class RegisterService {
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Account findById(@PathParam("id") Long id) {
-		try {
-			return Account.findById(id);
-		}catch (Exception e) {
-			LOGGER.error("Error on find by id", e.getCause());
-			throw e;
+	public Response findById(@PathParam("id") Long id) {
+		Account a = Account.findById(id);
+		if(a == null) {
+			return Response.status(Status.NOT_FOUND).build();
+		}else {
+			return Response.ok(a).build();
 		}
 	}
 
 	@GET
 	@Path("/blocked")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Account> findBlocked(@PathParam("id") Long id) {
-		try {
-			return Account.list("blocked", true);
-		}catch (Exception e) {
-			LOGGER.error("Error on find by id", e.getCause());
-			throw e;
+	public Response findBlocked(@PathParam("id") Long id) {
+		List<Account> accounts = Account.list("blocked", true);
+		if(accounts.size() == 0) {
+			return Response.status(Status.NOT_FOUND).build();
+		}else {
+			return Response.ok(accounts).build();
 		}
 	}
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Account> findAll() {
+	public Response findAll() {
 		try {
-			return Account.listAll();
+			return Response.ok(Account.listAll()).build();
 		}catch (Exception e) {
 			LOGGER.error("Error on find by id", e.getCause());
-			throw e;
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
 	}
 
@@ -73,30 +74,30 @@ public class RegisterService {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Result create(@Valid Account account) {
+	public Response create(@Valid Account account) {
 		try {
 			if(account.balance.compareTo(BigDecimal.ZERO) > 0) {
 				account.persist();
-				return new Result("Account registered!"); 
+				return Response.ok(account).build();
 			}else {
-				throw new NegativeBalanceOnCreationException();
+				return Response.status(Status.BAD_REQUEST).entity(new NegativeBalanceOnCreationException()).build();
 			}
 		}catch (Exception e) {
 			LOGGER.error("Error on create: "+e.getCause());
-			throw e;
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
 	}
 
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Account remove(@Valid Account account) {
+	public Response remove(@Valid Account account) {
 		try {
 			account.delete();
-			return account;
+			return Response.ok(account).build();
 		}catch (Exception e) {
-			LOGGER.error("Error on create: "+e.getCause());
-			throw e;
+			LOGGER.error(e.getLocalizedMessage());
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
 	}
 
@@ -105,13 +106,13 @@ public class RegisterService {
 	@Path("/updateBalance/{id}/{balance}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
-	public Account update(@PathParam("id") Long id, @PathParam("balance") BigDecimal balance) {
+	public Response update(@PathParam("id") Long id, @PathParam("balance") BigDecimal balance) {
 		try {
 			Account account = Account.findById(id);
 			account.balance = balance;
-			return account;
+			return Response.ok(account).build();
 		}catch (Exception e) {
-			throw new WebApplicationException("Error on update balance: "+e.getMessage(), Status.INTERNAL_SERVER_ERROR);
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e).build();
 		}
 	}
 
