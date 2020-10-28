@@ -3,6 +3,7 @@ package com.rmendes.register;
 import java.math.BigDecimal;
 import java.util.List;
 
+import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -14,7 +15,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.rmendes.register.exceptions.NegativeBalanceOnCreationException;
 import com.rmendes.register.model.Account;
-import com.rmendes.register.model.Result;
 
 @Path("/register")
 public class RegisterService {
@@ -36,6 +35,7 @@ public class RegisterService {
 	@GET
 	@Path("/{id}")
 	@Produces(MediaType.APPLICATION_JSON)
+	@RolesAllowed("client")
 	public Response findById(@PathParam("id") Long id) {
 		Account a = Account.findById(id);
 		if(a == null) {
@@ -48,6 +48,7 @@ public class RegisterService {
 	@GET
 	@Path("/blocked")
 	@Produces(MediaType.APPLICATION_JSON)
+	@RolesAllowed("client")
 	public Response findBlocked(@PathParam("id") Long id) {
 		List<Account> accounts = Account.list("blocked", true);
 		if(accounts.size() == 0) {
@@ -59,6 +60,7 @@ public class RegisterService {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
+	@RolesAllowed("client")
 	public Response findAll() {
 		try {
 			return Response.ok(Account.listAll()).build();
@@ -74,6 +76,7 @@ public class RegisterService {
 	@POST
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
+	@RolesAllowed("client")
 	public Response create(@Valid Account account) {
 		try {
 			if(account.balance.compareTo(BigDecimal.ZERO) > 0) {
@@ -91,6 +94,7 @@ public class RegisterService {
 	@DELETE
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
+	@RolesAllowed("client")
 	public Response remove(@Valid Account account) {
 		try {
 			account.delete();
@@ -106,6 +110,7 @@ public class RegisterService {
 	@Path("/updateBalance/{id}/{balance}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Transactional
+	@RolesAllowed("client")
 	public Response update(@PathParam("id") Long id, @PathParam("balance") BigDecimal balance) {
 		try {
 			Account account = Account.findById(id);
